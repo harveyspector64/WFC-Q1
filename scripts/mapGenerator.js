@@ -1,17 +1,15 @@
 // mapGenerator.js
 import { getTile } from './tileLoader.js';
 import { TILE_SIZE, MAP_WIDTH, MAP_HEIGHT } from './utils/constants.js';
+import { aStar } from './utils/aStar.js';
 
 const patterns = [
-    // Existing patterns
     ['grass', 'grass', 'grass', 'tree', 'grass', 'tree', 'grass', 'grass', 'grass'],
     ['water', 'water', 'water', 'grass', 'water', 'grass', 'water', 'water', 'water'],
     ['bush', 'bush', 'bush', 'dirt', 'bush', 'dirt', 'bush', 'bush', 'bush'],
     ['grass', 'grass', 'grass', 'grass', 'dirt', 'grass', 'grass', 'grass', 'grass'],
     ['grass', 'grass', 'grass', 'road', 'road', 'road', 'grass', 'grass', 'grass'],
-    // New lake pattern (simplified)
     ['water', 'water', 'water', 'water', 'water', 'water', 'water', 'water', 'water'],
-    // New river pattern (simplified)
     ['water', 'grass', 'grass', 'water', 'grass', 'grass', 'water', 'grass', 'grass']
 ];
 
@@ -40,7 +38,7 @@ function getMatchingPattern(map, x, y) {
 }
 
 function generateLakesAndRivers(map) {
-    // Simplified logic for generating a lake in the middle of the map
+    // Generate a lake in the middle of the map
     const lakeStartX = Math.floor(MAP_WIDTH / 4);
     const lakeStartY = Math.floor(MAP_HEIGHT / 4);
     const lakeEndX = lakeStartX + 5; // Arbitrary lake size
@@ -52,10 +50,15 @@ function generateLakesAndRivers(map) {
         }
     }
 
-    // Simplified logic for generating a vertical river
-    const riverX = Math.floor(MAP_WIDTH / 2);
-    for (let y = 0; y < MAP_HEIGHT; y++) {
-        map[y][riverX] = 'water';
+    // Generate a river using A* pathfinding
+    const start = [0, Math.floor(MAP_HEIGHT / 2)];
+    const goal = [MAP_WIDTH - 1, Math.floor(MAP_HEIGHT / 2)];
+    const riverPath = aStar(start, goal, map);
+
+    if (riverPath) {
+        for (const [x, y] of riverPath) {
+            map[y][x] = 'water';
+        }
     }
 }
 
