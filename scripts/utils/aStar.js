@@ -1,3 +1,5 @@
+import { MAP_WIDTH, MAP_HEIGHT } from './constants.js';
+
 export function generateRoadNetwork(map, roadCount) {
     for (let i = 0; i < roadCount; i++) {
         const start = [Math.floor(Math.random() * MAP_WIDTH), Math.floor(Math.random() * MAP_HEIGHT)];
