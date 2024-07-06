@@ -57,30 +57,40 @@ function generateWaterAndRoads(map) {
 
 function generateLakesAndRivers(map) {
     console.log('Generating river...');
-    // Simplified for a single river path
+    // Generate a more complex river path
     const start = [0, Math.floor(MAP_HEIGHT / 2)];
     const goal = [MAP_WIDTH - 1, Math.floor(MAP_HEIGHT / 2)];
     const riverPath = aStar(start, goal, map);
 
     if (riverPath) {
         for (const [x, y] of riverPath) {
-            map[y][x] = 'water';
+            if (map[y][x] !== 'road') {
+                map[y][x] = 'water';
+            }
         }
     }
 }
 
 function generateRoads(map) {
     console.log('Generating roads...');
-    // Simplified for a single vertical road path
-    const start = [Math.floor(MAP_WIDTH / 4), 0];
-    const goal = [Math.floor(MAP_WIDTH / 4), MAP_HEIGHT - 1];
-    const roadPath = aStar(start, goal, map);
+    // Generate more complex road paths
+    const roadPaths = [
+        aStar([Math.floor(MAP_WIDTH / 4), 0], [Math.floor(MAP_WIDTH / 4), MAP_HEIGHT - 1], map),
+        aStar([Math.floor(MAP_WIDTH / 2), 0], [Math.floor(MAP_WIDTH / 2), MAP_HEIGHT - 1], map),
+        aStar([3 * Math.floor(MAP_WIDTH / 4), 0], [3 * Math.floor(MAP_WIDTH / 4), MAP_HEIGHT - 1], map)
+    ];
 
-    if (roadPath) {
-        for (const [x, y] of roadPath) {
-            map[y][x] = 'road';
+    for (const roadPath of roadPaths) {
+        if (roadPath) {
+            for (const [x, y] of roadPath) {
+                if (map[y][x] !== 'water') {
+                    map[y][x] = 'road';
+                }
+            }
         }
     }
+}
+
 }
 
 function drawMap(ctx, map) {
