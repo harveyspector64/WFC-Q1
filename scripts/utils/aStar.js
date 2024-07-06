@@ -1,80 +1,79 @@
 // aStar.js
 export function aStar(start, goal, map) {
-    // Basic A* algorithm
-    const openSet = [];
-    const closedSet = [];
-    const startNode = {
-        x: start[0],
-        y: start[1],
-        g: 0,
-        h: heuristic(start, goal),
-        f: 0,
-        parent: null
-    };
-    startNode.f = startNode.g + startNode.h;
-    openSet.push(startNode);
+    const openSet = [start];
+    const cameFrom = {};
+    const gScore = {};
+    const fScore = {};
+
+    for (let y = 0; y < map.length; y++) {
+        for (let x = 0; x < map[0].length; x++) {
+            gScore[`${x},${y}`] = Infinity;
+            fScore[`${x},${y}`] = Infinity;
+        }
+    }
+
+    gScore[`${start[0]},${start[1]}`] = 0;
+    fScore[`${start[0]},${start[1]}`] = heuristicCostEstimate(start, goal);
 
     while (openSet.length > 0) {
-        // Sort by f value and take the lowest
-        openSet.sort((a, b) => a.f - b.f);
-        const currentNode = openSet.shift();
-        closedSet.push(currentNode);
-
-        // If goal is reached, reconstruct path
-        if (currentNode.x === goal[0] && currentNode.y === goal[1]) {
-            return reconstructPath(currentNode);
+        const current = openSet.reduce((a, b) => (fScore[`${a[0]},${a[1]}`] < fScore[`${b[0]},${b[1]}`] ? a : b));
+        if (current[0] === goal[0] && current[1] === goal[1]) {
+            return reconstructPath(cameFrom, current);
         }
 
-        const neighbors = getNeighbors(currentNode, map);
-        for (const neighbor of neighbors) {
-            if (closedSet.find(node => node.x === neighbor.x && node.y === neighbor.y)) {
-                continue;
-            }
-
-            const tentativeG = currentNode.g + 1;
-            let neighborNode = openSet.find(node => node.x === neighbor.x && node.y === neighbor.y);
-            if (!neighborNode) {
-                neighborNode = {
-                    x: neighbor.x,
-                    y: neighbor.y,
-                    g: tentativeG,
-                    h: heuristic([neighbor.x, neighbor.y], goal),
-                    f: 0,
-                    parent: currentNode
-                };
-                neighborNode.f = neighborNode.g + neighborNode.h;
-                openSet.push(neighborNode);
-            } else if (tentativeG < neighborNode.g) {
-                neighborNode.g = tentativeG;
-                neighborNode.f = neighborNode.g + neighborNode.h;
-                neighborNode.parent = currentNode;
+        openSet.splice(openSet.indexOf(current), 1);
+        for (const neighbor of getNeighbors(current, map)) {
+            const tentativeGScore = gScore[`${current[0]},${current[1]}`] + 1;
+            if (tentativeGScore < gScore[`${neighbor[0]},${neighbor[1]}`]) {
+                cameFrom[`${neighbor[0]},${neighbor[1]}`] = current;
+                gScore[`${neighbor[0]},${neighbor[1]}`] = tentativeGScore;
+                fScore[`${neighbor[0]},${neighbor[1]}`] = gScore[`${neighbor[0]},${neighbor[1]}`] + heuristicCostEstimate(neighbor, goal);
+                if (!openSet.some(node => node[0] === neighbor[0] && node[1] === neighbor[1])) {
+                    openSet.push(neighbor);
+                }
             }
         }
     }
 
-    return null; // No path found
+    return [];
 }
 
-function heuristic(pos0, pos1) {
-    // Manhattan distance heuristic
-    return Math.abs(pos0[0] - pos1[0]) + Math.abs(pos0[1] - pos1[1]);
+function heuristicCostEstimate(start, goal) {
+    return Math.abs(start[0] - goal[0]) + Math.abs(start[1] - goal[1]);
 }
 
 function getNeighbors(node, map) {
-    const { x, y } = node;
+    const [x, y] = node;
     const neighbors = [];
-    if (x > 0) neighbors.push({ x: x - 1, y: y });
-    if (x < map[0].length - 1) neighbors.push({ x: x + 1, y: y });
-    if (y > 0) neighbors.push({ x: x, y: y - 1 });
-    if (y < map.length - 1) neighbors.push({ x: x, y: y + 1 });
+    if (x > 0) neighbors.push([x - 1, y]);
+    if (x < map[0].length - 1) neighbors.push([x + 1, y]);
+    if (y > 0) neighbors.push([x, y - 1]);
+    if (y < map.length - 1) neighbors.push([x, y + 1]);
     return neighbors;
 }
 
-function reconstructPath(node) {
-    const path = [];
-    while (node) {
-        path.push([node.x, node.y]);
-        node = node.parent;
+function reconstructPath(cameFrom, current) {
+    const path = [current];
+    while (cameFrom[`${current[0]},${current[1]}`]) {
+        current = cameFrom[`${current[0]},${current[1]}`];
+        path.unshift(current);
     }
-    return path.reverse();
+    return path;
+}
+
+export function createCurvedPath(start, goal, map) {
+    const path = [];
+    let [x, y] = start;
+
+    while (x !== goal[0] || y !== goal[1]) {
+        path.push([x, y]);
+        if (Math.random() > 0.5) {
+            x += Math.sign(goal[0] - x);
+        } else {
+            y += Math.sign(goal[1] - y);
+        }
+    }
+    
+    path.push(goal);
+    return path;
 }
