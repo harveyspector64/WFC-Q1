@@ -91,8 +91,6 @@ function generateRoads(map) {
     }
 }
 
-}
-
 function drawMap(ctx, map) {
     for (let y = 0; y < MAP_HEIGHT; y++) {
         for (let x = 0; x < MAP_WIDTH; x++) {
