@@ -5,19 +5,18 @@ import { aStar } from './utils/aStar.js';
 
 const patterns = [
     ['grass', 'grass', 'grass', 'tree', 'grass', 'tree', 'grass', 'grass', 'grass'],
-    ['water', 'water', 'water', 'grass', 'water', 'grass', 'water', 'water', 'water'],
     ['bush', 'bush', 'bush', 'dirt', 'bush', 'dirt', 'bush', 'bush', 'bush'],
     ['grass', 'grass', 'grass', 'grass', 'dirt', 'grass', 'grass', 'grass', 'grass'],
     ['grass', 'grass', 'grass', 'road', 'road', 'road', 'grass', 'grass', 'grass'],
-    ['water', 'water', 'water', 'water', 'water', 'water', 'water', 'water', 'water'],
-    ['water', 'grass', 'grass', 'water', 'grass', 'grass', 'water', 'grass', 'grass']
+    ['hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill']
 ];
 
-export function generateWFCTile(ctx) {
-    console.log('Generating map with WFC...');
+export function generateMap(ctx) {
+    console.log('Generating map...');
     const map = initializeMap();
-    generateLakesAndRivers(map);
-    generateTerrain(map, ctx);
+    generateBaseTerrain(map);
+    generateWaterAndRoads(map);
+    drawMap(ctx, map);
     console.log('Map generation complete.');
 }
 
@@ -26,31 +25,36 @@ function initializeMap() {
     for (let y = 0; y < MAP_HEIGHT; y++) {
         map[y] = [];
         for (let x = 0; x < MAP_WIDTH; x++) {
-            map[y][x] = null;
+            map[y][x] = 'grass'; // Default to grass
         }
     }
     return map;
 }
 
-function getMatchingPattern(map, x, y) {
+function generateBaseTerrain(map) {
+    console.log('Generating base terrain...');
+    for (let y = 0; y < MAP_HEIGHT; y++) {
+        for (let x = 0; x < MAP_WIDTH; x++) {
+            const pattern = getMatchingPattern();
+            map[y][x] = pattern[4];
+        }
+    }
+    console.log('Base terrain generation complete.');
+}
+
+function getMatchingPattern() {
     const randomIndex = Math.floor(Math.random() * patterns.length);
     return patterns[randomIndex];
 }
 
+function generateWaterAndRoads(map) {
+    console.log('Generating water and roads...');
+    generateLakesAndRivers(map);
+    generateRoads(map);
+    console.log('Water and road generation complete.');
+}
+
 function generateLakesAndRivers(map) {
-    // Generate a lake in the middle of the map
-    const lakeStartX = Math.floor(MAP_WIDTH / 4);
-    const lakeStartY = Math.floor(MAP_HEIGHT / 4);
-    const lakeEndX = lakeStartX + 5; // Arbitrary lake size
-    const lakeEndY = lakeStartY + 5;
-
-    for (let y = lakeStartY; y < lakeEndY; y++) {
-        for (let x = lakeStartX; x < lakeEndX; x++) {
-            map[y][x] = 'water';
-        }
-    }
-
-    // Generate a river using A* pathfinding
     const start = [0, Math.floor(MAP_HEIGHT / 2)];
     const goal = [MAP_WIDTH - 1, Math.floor(MAP_HEIGHT / 2)];
     const riverPath = aStar(start, goal, map);
@@ -62,14 +66,21 @@ function generateLakesAndRivers(map) {
     }
 }
 
-function generateTerrain(map, ctx) {
+function generateRoads(map) {
+    const start = [Math.floor(MAP_WIDTH / 4), 0];
+    const goal = [Math.floor(MAP_WIDTH / 4), MAP_HEIGHT - 1];
+    const roadPath = aStar(start, goal, map);
+
+    if (roadPath) {
+        for (const [x, y] of roadPath) {
+            map[y][x] = 'road';
+        }
+    }
+}
+
+function drawMap(ctx, map) {
     for (let y = 0; y < MAP_HEIGHT; y++) {
         for (let x = 0; x < MAP_WIDTH; x++) {
-            if (!map[y][x]) {
-                const pattern = getMatchingPattern(map, x, y);
-                const tileType = pattern ? pattern[4] : 'grass';
-                map[y][x] = tileType;
-            }
             drawTile(ctx, map[y][x], x, y);
         }
     }
