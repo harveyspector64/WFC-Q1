@@ -66,9 +66,11 @@ function createRandomTerrainRegions(map, terrainType, count) {
 
 function generateLakesAndRivers(map) {
     console.log('Generating river...');
-    // Generate a more complex river path
-    const start = [0, Math.floor(MAP_HEIGHT / 2)];
-    const goal = [MAP_WIDTH - 1, Math.floor(MAP_HEIGHT / 2)];
+    // Randomize the river start and end points
+    const startY = Math.floor(Math.random() * MAP_HEIGHT);
+    const endY = Math.floor(Math.random() * MAP_HEIGHT);
+    const start = [0, startY];
+    const goal = [MAP_WIDTH - 1, endY];
     const riverPath = aStar(start, goal, map);
 
     if (riverPath) {
@@ -82,12 +84,16 @@ function generateLakesAndRivers(map) {
 
 function generateRoads(map) {
     console.log('Generating roads...');
-    // Generate more complex road paths
-    const roadPaths = [
-        aStar([Math.floor(MAP_WIDTH / 4), 0], [Math.floor(MAP_WIDTH / 4), MAP_HEIGHT - 1], map),
-        aStar([Math.floor(MAP_WIDTH / 2), 0], [Math.floor(MAP_WIDTH / 2), MAP_HEIGHT - 1], map),
-        aStar([3 * Math.floor(MAP_WIDTH / 4), 0], [3 * Math.floor(MAP_WIDTH / 4), MAP_HEIGHT - 1], map)
-    ];
+    // Randomize road paths
+    const roadPaths = [];
+    const roadCount = Math.floor(Math.random() * 3) + 1; // Random number of roads between 1 and 3
+
+    for (let i = 0; i < roadCount; i++) {
+        const startX = Math.floor(Math.random() * MAP_WIDTH);
+        const startY = 0;
+        const goalY = MAP_HEIGHT - 1;
+        roadPaths.push(aStar([startX, startY], [startX, goalY], map));
+    }
 
     for (const roadPath of roadPaths) {
         if (roadPath) {
