@@ -1,6 +1,6 @@
 // tileLoader.js
-const TILE_SIZE = 32;
-const TILE_NAMES = ['grass', 'water', 'tree', 'bush', 'dirt', 'road'];
+export const TILE_SIZE = 32;
+export const TILE_NAMES = ['grass', 'water', 'tree', 'bush', 'dirt', 'road'];
 const tiles = {};
 
 function loadTile(name) {
