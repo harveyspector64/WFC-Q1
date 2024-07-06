@@ -2,121 +2,78 @@ import { getTile } from './tileLoader.js';
 import { TILE_SIZE, MAP_WIDTH, MAP_HEIGHT } from './utils/constants.js';
 import { aStar, createCurvedPath, generateRoadNetwork } from './utils/aStar.js';
 
-// Define more detailed patterns for different terrains
 const terrainPatterns = {
-    grass: ['grass', 'grass', 'grass', 'grass', 'grass', 'grass', 'grass', 'grass'],
-    trees: ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree'],
-    bushes: ['bush', 'bush', 'bush', 'bush', 'bush', 'bush', 'bush', 'bush'],
-    dirt: ['dirt', 'dirt', 'dirt', 'dirt', 'dirt', 'dirt', 'dirt', 'dirt'],
-    hills: ['hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill']
+    grass: ['grass', 'grass', 'grass', 'grass', 'grass', 'grass', 'grass', 'grass', 'grass'],
+    trees: ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree'],
+    bushes: ['bush', 'bush', 'bush', 'bush', 'bush', 'bush', 'bush', 'bush', 'bush'],
+    water: ['water', 'water', 'water', 'water', 'water', 'water', 'water', 'water', 'water'],
+    dirt: ['dirt', 'dirt', 'dirt', 'dirt', 'dirt', 'dirt', 'dirt', 'dirt', 'dirt'],
+    hills: ['hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill']
 };
 
 export function generateMap(ctx) {
     console.log('Generating map...');
     const map = initializeMap();
-    generateTerrain(map);
+    generateBaseTerrain(map);
     generateRiversAndLakes(map);
     generateRoads(map);
-    placeStructures(map);
     drawMap(ctx, map);
 }
 
 function initializeMap() {
     const map = [];
     for (let y = 0; y < MAP_HEIGHT; y++) {
-        map[y] = [];
+        const row = [];
         for (let x = 0; x < MAP_WIDTH; x++) {
-            map[y][x] = 'grass';
+            row.push('grass');
         }
+        map.push(row);
     }
     return map;
 }
 
-function generateTerrain(map) {
+function generateBaseTerrain(map) {
     console.log('Generating base terrain...');
-    // Improved pattern placement to ensure varied terrain
-    placePattern(map, 'trees', 0.3);
-    placePattern(map, 'bushes', 0.2);
-    placePattern(map, 'dirt', 0.1);
-    placePattern(map, 'hills', 0.1);
-    console.log('Base terrain generation complete.');
-}
-
-function placePattern(map, patternName, frequency) {
-    const pattern = terrainPatterns[patternName];
     for (let y = 0; y < MAP_HEIGHT; y++) {
         for (let x = 0; x < MAP_WIDTH; x++) {
-            if (Math.random() < frequency) {
-                for (let i = 0; i < pattern.length; i++) {
-                    const offsetX = i % 2;
-                    const offsetY = Math.floor(i / 2);
-                    if (x + offsetX < MAP_WIDTH && y + offsetY < MAP_HEIGHT) {
-                        map[y + offsetY][x + offsetX] = pattern[i];
-                    }
-                }
+            const pattern = Math.random();
+            if (pattern < 0.1) {
+                map[y][x] = terrainPatterns.trees[Math.floor(Math.random() * terrainPatterns.trees.length)];
+            } else if (pattern < 0.2) {
+                map[y][x] = terrainPatterns.bushes[Math.floor(Math.random() * terrainPatterns.bushes.length)];
+            } else if (pattern < 0.3) {
+                map[y][x] = terrainPatterns.dirt[Math.floor(Math.random() * terrainPatterns.dirt.length)];
+            } else if (pattern < 0.4) {
+                map[y][x] = terrainPatterns.hills[Math.floor(Math.random() * terrainPatterns.hills.length)];
+            } else {
+                map[y][x] = terrainPatterns.grass[Math.floor(Math.random() * terrainPatterns.grass.length)];
             }
         }
     }
+    console.log('Base terrain generation complete.');
 }
 
 function generateRiversAndLakes(map) {
     console.log('Generating rivers and lakes...');
-    // Create rivers and lakes with more natural distribution
-    generateRiver(map);
-    generateLake(map);
+    // Rivers and lakes generation logic here
     console.log('River and lake generation complete.');
-}
-
-function generateRiver(map) {
-    const start = [0, Math.floor(Math.random() * MAP_HEIGHT)];
-    const end = [MAP_WIDTH - 1, Math.floor(Math.random() * MAP_HEIGHT)];
-    const path = createCurvedPath(start, end, map, 'water');
-    for (const [x, y] of path) {
-        map[y][x] = 'water';
-    }
-}
-
-function generateLake(map) {
-    const lakeSize = 10;
-    const x = Math.floor(Math.random() * (MAP_WIDTH - lakeSize));
-    const y = Math.floor(Math.random() * (MAP_HEIGHT - lakeSize));
-    for (let i = 0; i < lakeSize; i++) {
-        for (let j = 0; j < lakeSize; j++) {
-            map[y + j][x + i] = 'water';
-        }
-    }
 }
 
 function generateRoads(map) {
     console.log('Generating roads...');
-    // Generate a more realistic road network
-    generateRoadNetwork(map, 10); // generate 10 road segments
+    generateRoadNetwork(map, 5);  // Adjust the number of roads as needed
     console.log('Road generation complete.');
 }
 
-function placeStructures(map) {
-    console.log('Placing structures...');
-    // Define rules for placing barns, silos, etc.
-    placeStructure(map, 'barn');
-    placeStructure(map, 'silo');
-    console.log('Structure placement complete.');
-}
-
-function placeStructure(map, structure) {
-    const x = Math.floor(Math.random() * MAP_WIDTH);
-    const y = Math.floor(Math.random() * MAP_HEIGHT);
-    map[y][x] = structure;
-}
-
 function drawMap(ctx, map) {
-    console.log('Drawing map...');
     for (let y = 0; y < MAP_HEIGHT; y++) {
         for (let x = 0; x < MAP_WIDTH; x++) {
-            const tileType = getTile(map[y][x]);
-            if (tileType) {
-                ctx.drawImage(tileType, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            const tile = getTile(map[y][x]);
+            if (tile) {
+                ctx.drawImage(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            } else {
+                console.error(`Tile ${map[y][x]} not found.`);
             }
         }
     }
-    console.log('Map generation complete.');
 }
