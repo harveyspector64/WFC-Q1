@@ -2,7 +2,7 @@ export function generateRoadNetwork(map, roadCount) {
     for (let i = 0; i < roadCount; i++) {
         const start = [Math.floor(Math.random() * MAP_WIDTH), Math.floor(Math.random() * MAP_HEIGHT)];
         const end = [Math.floor(Math.random() * MAP_WIDTH), Math.floor(Math.random() * MAP_HEIGHT)];
-        const path = aStar(start, end, map, 'road');
+        const path = aStar(start, end, map);
         for (const [x, y] of path) {
             map[y][x] = 'road';
         }
@@ -22,7 +22,7 @@ function getNeighbors([x, y], map) {
     return neighbors;
 }
 
-function aStar(start, goal, map, tileType) {
+export function aStar(start, goal, map) {
     const openSet = [start];
     const cameFrom = {};
     const gScore = {};
@@ -65,4 +65,21 @@ function aStar(start, goal, map, tileType) {
     }
 
     return [];
+}
+
+export function createCurvedPath(start, goal, map) {
+    const path = [];
+    let [x, y] = start;
+
+    while (x !== goal[0] || y !== goal[1]) {
+        path.push([x, y]);
+        if (Math.random() > 0.8) {
+            x += Math.sign(goal[0] - x);
+        } else {
+            y += Math.sign(goal[1] - y);
+        }
+    }
+
+    path.push(goal);
+    return path;
 }
