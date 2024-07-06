@@ -44,6 +44,7 @@ function generateBaseTerrain(map) {
 
 function getMatchingPattern() {
     const randomIndex = Math.floor(Math.random() * patterns.length);
+    console.log(`Selected pattern index: ${randomIndex}`);
     return patterns[randomIndex];
 }
 
@@ -55,6 +56,7 @@ function generateWaterAndRoads(map) {
 }
 
 function generateLakesAndRivers(map) {
+    console.log('Generating river...');
     // Simplified for a single river path
     const start = [0, Math.floor(MAP_HEIGHT / 2)];
     const goal = [MAP_WIDTH - 1, Math.floor(MAP_HEIGHT / 2)];
@@ -68,6 +70,7 @@ function generateLakesAndRivers(map) {
 }
 
 function generateRoads(map) {
+    console.log('Generating roads...');
     // Simplified for a single vertical road path
     const start = [Math.floor(MAP_WIDTH / 4), 0];
     const goal = [Math.floor(MAP_WIDTH / 4), MAP_HEIGHT - 1];
