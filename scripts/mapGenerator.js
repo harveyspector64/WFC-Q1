@@ -16,9 +16,12 @@ export function generateWFCTile(ctx) {
             const pattern = getMatchingPattern(map, x, y);
             const tileType = pattern ? pattern[4] : 'grass';
             map[y][x] = tileType;
+            console.log(`Selected pattern for (${x}, ${y}):`, pattern);
+            console.log(`Drawing ${tileType} at (${x}, ${y})`);
             drawTile(ctx, tileType, x, y);
         }
     }
+    console.log('Map generation complete.');
 }
 
 function initializeMap() {
@@ -35,6 +38,7 @@ function initializeMap() {
 function getMatchingPattern(map, x, y) {
     // For simplicity, just return a random pattern for now
     const randomIndex = Math.floor(Math.random() * patterns.length);
+    console.log(`Randomly selected pattern index: ${randomIndex}`);
     return patterns[randomIndex];
 }
 
