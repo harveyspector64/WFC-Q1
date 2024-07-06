@@ -55,6 +55,7 @@ function generateWaterAndRoads(map) {
 }
 
 function generateLakesAndRivers(map) {
+    // Simplified for a single river path
     const start = [0, Math.floor(MAP_HEIGHT / 2)];
     const goal = [MAP_WIDTH - 1, Math.floor(MAP_HEIGHT / 2)];
     const riverPath = aStar(start, goal, map);
@@ -67,6 +68,7 @@ function generateLakesAndRivers(map) {
 }
 
 function generateRoads(map) {
+    // Simplified for a single vertical road path
     const start = [Math.floor(MAP_WIDTH / 4), 0];
     const goal = [Math.floor(MAP_WIDTH / 4), MAP_HEIGHT - 1];
     const roadPath = aStar(start, goal, map);
