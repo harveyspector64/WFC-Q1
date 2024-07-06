@@ -9,9 +9,13 @@ function loadTile(name) {
         img.src = `../assets/${name}.png`;
         img.onload = () => {
             tiles[name] = img;
+            console.log(`${name} tile loaded.`);
             resolve();
         };
-        img.onerror = reject;
+        img.onerror = () => {
+            console.error(`Failed to load ${name} tile.`);
+            reject(new Error(`Failed to load ${name} tile.`));
+        };
     });
 }
 
