@@ -36,22 +36,29 @@ function initializeMap() {
 function generateBaseTerrain(map) {
     console.log('Generating base terrain...');
 
-    // Create regions for different terrains
-    createTerrainRegion(map, 'grass', 0, 0, MAP_WIDTH, MAP_HEIGHT);
-    createTerrainRegion(map, 'trees', Math.floor(MAP_WIDTH / 4), Math.floor(MAP_HEIGHT / 4), Math.floor(MAP_WIDTH / 2), Math.floor(MAP_HEIGHT / 2));
-    createTerrainRegion(map, 'bushes', Math.floor(MAP_WIDTH / 2), Math.floor(MAP_HEIGHT / 2), Math.floor(MAP_WIDTH / 3), Math.floor(MAP_HEIGHT / 3));
-    createTerrainRegion(map, 'dirt', Math.floor(MAP_WIDTH / 3), Math.floor(MAP_HEIGHT / 3), Math.floor(MAP_WIDTH / 4), Math.floor(MAP_HEIGHT / 4));
-    createTerrainRegion(map, 'hills', Math.floor(MAP_WIDTH / 6), Math.floor(MAP_HEIGHT / 6), Math.floor(MAP_WIDTH / 4), Math.floor(MAP_HEIGHT / 4));
+    // Create regions for different terrains with random positions and sizes
+    createRandomTerrainRegions(map, 'grass', 3);
+    createRandomTerrainRegions(map, 'trees', 2);
+    createRandomTerrainRegions(map, 'bushes', 2);
+    createRandomTerrainRegions(map, 'dirt', 1);
+    createRandomTerrainRegions(map, 'hills', 1);
 
     console.log('Base terrain generation complete.');
 }
 
-function createTerrainRegion(map, terrainType, startX, startY, width, height) {
+function createRandomTerrainRegions(map, terrainType, count) {
     const pattern = terrainPatterns[terrainType];
-    for (let y = startY; y < startY + height; y++) {
-        for (let x = startX; x < startX + width; x++) {
-            if (y < MAP_HEIGHT && x < MAP_WIDTH) {
-                map[y][x] = pattern[Math.floor(Math.random() * pattern.length)];
+    for (let i = 0; i < count; i++) {
+        const startX = Math.floor(Math.random() * MAP_WIDTH);
+        const startY = Math.floor(Math.random() * MAP_HEIGHT);
+        const width = Math.floor(Math.random() * (MAP_WIDTH / 2)) + 1;
+        const height = Math.floor(Math.random() * (MAP_HEIGHT / 2)) + 1;
+
+        for (let y = startY; y < startY + height; y++) {
+            for (let x = startX; x < startX + width; x++) {
+                if (y < MAP_HEIGHT && x < MAP_WIDTH) {
+                    map[y][x] = pattern[Math.floor(Math.random() * pattern.length)];
+                }
             }
         }
     }
