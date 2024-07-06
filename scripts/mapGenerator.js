@@ -5,7 +5,9 @@ import { TILE_SIZE, MAP_WIDTH, MAP_HEIGHT } from './utils/constants.js';
 const patterns = [
     ['grass', 'grass', 'grass', 'tree', 'grass', 'tree', 'grass', 'grass', 'grass'],
     ['water', 'water', 'water', 'grass', 'water', 'grass', 'water', 'water', 'water'],
-    ['bush', 'bush', 'bush', 'dirt', 'bush', 'dirt', 'bush', 'bush', 'bush']
+    ['bush', 'bush', 'bush', 'dirt', 'bush', 'dirt', 'bush', 'bush', 'bush'],
+    ['grass', 'grass', 'grass', 'grass', 'dirt', 'grass', 'grass', 'grass', 'grass'], // Added dirt pattern
+    ['grass', 'grass', 'grass', 'road', 'road', 'road', 'grass', 'grass', 'grass']   // Added road pattern
 ];
 
 export function generateWFCTile(ctx) {
