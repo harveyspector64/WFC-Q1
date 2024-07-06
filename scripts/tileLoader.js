@@ -6,7 +6,7 @@ const tiles = {};
 function loadTile(name) {
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.src = `../assets/${name}.png`;
+        img.src = `./assets/${name}.png`; // Corrected path
         img.onload = () => {
             tiles[name] = img;
             console.log(`${name} tile loaded.`);
