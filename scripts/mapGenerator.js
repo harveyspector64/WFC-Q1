@@ -3,19 +3,21 @@ import { getTile } from './tileLoader.js';
 import { TILE_SIZE, MAP_WIDTH, MAP_HEIGHT } from './utils/constants.js';
 import { aStar } from './utils/aStar.js';
 
-const patterns = [
-    ['grass', 'grass', 'grass', 'tree', 'grass', 'tree', 'grass', 'grass', 'grass'],
-    ['bush', 'bush', 'bush', 'dirt', 'bush', 'dirt', 'bush', 'bush', 'bush'],
-    ['grass', 'grass', 'grass', 'grass', 'dirt', 'grass', 'grass', 'grass', 'grass'],
-    ['grass', 'grass', 'grass', 'road', 'road', 'road', 'grass', 'grass', 'grass'],
-    ['hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill']
-];
+// Define more detailed patterns for different terrains
+const terrainPatterns = {
+    grass: ['grass', 'grass', 'grass', 'grass', 'grass', 'grass', 'grass', 'grass', 'grass'],
+    trees: ['tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree'],
+    bushes: ['bush', 'bush', 'bush', 'bush', 'bush', 'bush', 'bush', 'bush', 'bush'],
+    dirt: ['dirt', 'dirt', 'dirt', 'dirt', 'dirt', 'dirt', 'dirt', 'dirt', 'dirt'],
+    hills: ['hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill', 'hill']
+};
 
 export function generateMap(ctx) {
     console.log('Generating map...');
     const map = initializeMap();
     generateBaseTerrain(map);
-    generateWaterAndRoads(map);
+    generateLakesAndRivers(map);
+    generateRoads(map);
     drawMap(ctx, map);
     console.log('Map generation complete.');
 }
@@ -25,7 +27,7 @@ function initializeMap() {
     for (let y = 0; y < MAP_HEIGHT; y++) {
         map[y] = [];
         for (let x = 0; x < MAP_WIDTH; x++) {
-            map[y][x] = 'grass'; // Default to grass
+            map[y][x] = null; // Initialize with null to differentiate unassigned tiles
         }
     }
     return map;
@@ -33,26 +35,26 @@ function initializeMap() {
 
 function generateBaseTerrain(map) {
     console.log('Generating base terrain...');
-    for (let y = 0; y < MAP_HEIGHT; y++) {
-        for (let x = 0; x < MAP_WIDTH; x++) {
-            const pattern = getMatchingPattern();
-            map[y][x] = pattern[4];
-        }
-    }
+
+    // Create regions for different terrains
+    createTerrainRegion(map, 'grass', 0, 0, MAP_WIDTH, MAP_HEIGHT);
+    createTerrainRegion(map, 'trees', Math.floor(MAP_WIDTH / 4), Math.floor(MAP_HEIGHT / 4), Math.floor(MAP_WIDTH / 2), Math.floor(MAP_HEIGHT / 2));
+    createTerrainRegion(map, 'bushes', Math.floor(MAP_WIDTH / 2), Math.floor(MAP_HEIGHT / 2), Math.floor(MAP_WIDTH / 3), Math.floor(MAP_HEIGHT / 3));
+    createTerrainRegion(map, 'dirt', Math.floor(MAP_WIDTH / 3), Math.floor(MAP_HEIGHT / 3), Math.floor(MAP_WIDTH / 4), Math.floor(MAP_HEIGHT / 4));
+    createTerrainRegion(map, 'hills', Math.floor(MAP_WIDTH / 6), Math.floor(MAP_HEIGHT / 6), Math.floor(MAP_WIDTH / 4), Math.floor(MAP_HEIGHT / 4));
+
     console.log('Base terrain generation complete.');
 }
 
-function getMatchingPattern() {
-    const randomIndex = Math.floor(Math.random() * patterns.length);
-    console.log(`Selected pattern index: ${randomIndex}`);
-    return patterns[randomIndex];
-}
-
-function generateWaterAndRoads(map) {
-    console.log('Generating water and roads...');
-    generateLakesAndRivers(map);
-    generateRoads(map);
-    console.log('Water and road generation complete.');
+function createTerrainRegion(map, terrainType, startX, startY, width, height) {
+    const pattern = terrainPatterns[terrainType];
+    for (let y = startY; y < startY + height; y++) {
+        for (let x = startX; x < startX + width; x++) {
+            if (y < MAP_HEIGHT && x < MAP_WIDTH) {
+                map[y][x] = pattern[Math.floor(Math.random() * pattern.length)];
+            }
+        }
+    }
 }
 
 function generateLakesAndRivers(map) {
@@ -94,6 +96,9 @@ function generateRoads(map) {
 function drawMap(ctx, map) {
     for (let y = 0; y < MAP_HEIGHT; y++) {
         for (let x = 0; x < MAP_WIDTH; x++) {
+            if (!map[y][x]) {
+                map[y][x] = 'grass'; // Default to grass if no tile assigned
+            }
             drawTile(ctx, map[y][x], x, y);
         }
     }
