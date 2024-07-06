@@ -1,16 +1,3 @@
-import { MAP_WIDTH, MAP_HEIGHT } from './constants.js';
-
-export function generateRoadNetwork(map, roadCount) {
-    for (let i = 0; i < roadCount; i++) {
-        const start = [Math.floor(Math.random() * MAP_WIDTH), Math.floor(Math.random() * MAP_HEIGHT)];
-        const end = [Math.floor(Math.random() * MAP_WIDTH), Math.floor(Math.random() * MAP_HEIGHT)];
-        const path = aStar(start, end, map);
-        for (const [x, y] of path) {
-            map[y][x] = 'road';
-        }
-    }
-}
-
 function heuristic(a, b) {
     return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 }
@@ -84,4 +71,15 @@ export function createCurvedPath(start, goal, map) {
 
     path.push(goal);
     return path;
+}
+
+export function generateRoadNetwork(map, roadCount) {
+    for (let i = 0; i < roadCount; i++) {
+        const start = [Math.floor(Math.random() * MAP_WIDTH), Math.floor(Math.random() * MAP_HEIGHT)];
+        const end = [Math.floor(Math.random() * MAP_WIDTH), Math.floor(Math.random() * MAP_HEIGHT)];
+        const path = createCurvedPath(start, end, map);
+        for (const [x, y] of path) {
+            map[y][x] = 'road';
+        }
+    }
 }
