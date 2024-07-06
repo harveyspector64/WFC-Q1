@@ -1,7 +1,7 @@
 // mapGenerator.js
 import { getTile } from './tileLoader.js';
 import { TILE_SIZE, MAP_WIDTH, MAP_HEIGHT } from './utils/constants.js';
-import { aStar } from './utils/aStar.js';
+import { aStar, createCurvedPath } from './utils/aStar.js';
 
 // Define more detailed patterns for different terrains
 const terrainPatterns = {
@@ -65,17 +65,43 @@ function createRandomTerrainRegions(map, terrainType, count) {
 }
 
 function generateLakesAndRivers(map) {
-    console.log('Generating river...');
-    // Randomize the river start and end points
-    const startY = Math.floor(Math.random() * MAP_HEIGHT);
-    const endY = Math.floor(Math.random() * MAP_HEIGHT);
-    const start = [0, startY];
-    const goal = [MAP_WIDTH - 1, endY];
-    const riverPath = aStar(start, goal, map);
+    console.log('Generating rivers and lakes...');
+    // Generate rivers with curved paths
+    const riverPaths = [];
+    const riverCount = Math.floor(Math.random() * 3) + 1; // Random number of rivers between 1 and 3
 
-    if (riverPath) {
-        for (const [x, y] of riverPath) {
-            if (map[y][x] !== 'road') {
+    for (let i = 0; i < riverCount; i++) {
+        const startY = Math.floor(Math.random() * MAP_HEIGHT);
+        const endY = Math.floor(Math.random() * MAP_HEIGHT);
+        const start = [0, startY];
+        const goal = [MAP_WIDTH - 1, endY];
+        const riverPath = createCurvedPath(start, goal, map);
+
+        if (riverPath) {
+            riverPaths.push(riverPath);
+            for (const [x, y] of riverPath) {
+                if (map[y][x] !== 'road') {
+                    map[y][x] = 'water';
+                }
+            }
+        }
+    }
+
+    // Generate lakes/ponds
+    const lakeCount = Math.floor(Math.random() * 3) + 1; // Random number of lakes between 1 and 3
+    for (let i = 0; i < lakeCount; i++) {
+        const lakeX = Math.floor(Math.random() * MAP_WIDTH);
+        const lakeY = Math.floor(Math.random() * MAP_HEIGHT);
+        const lakeWidth = Math.floor(Math.random() * 5) + 3;
+        const lakeHeight = Math.floor(Math.random() * 5) + 3;
+        createLake(map, lakeX, lakeY, lakeWidth, lakeHeight);
+    }
+}
+
+function createLake(map, startX, startY, width, height) {
+    for (let y = startY; y < startY + height; y++) {
+        for (let x = startX; x < startX + width; x++) {
+            if (y < MAP_HEIGHT && x < MAP_WIDTH) {
                 map[y][x] = 'water';
             }
         }
@@ -84,7 +110,7 @@ function generateLakesAndRivers(map) {
 
 function generateRoads(map) {
     console.log('Generating roads...');
-    // Randomize road paths
+    // Generate more complex road paths with intersections
     const roadPaths = [];
     const roadCount = Math.floor(Math.random() * 3) + 1; // Random number of roads between 1 and 3
 
@@ -92,13 +118,27 @@ function generateRoads(map) {
         const startX = Math.floor(Math.random() * MAP_WIDTH);
         const startY = 0;
         const goalY = MAP_HEIGHT - 1;
-        roadPaths.push(aStar([startX, startY], [startX, goalY], map));
+        const roadPath = createCurvedPath([startX, startY], [startX, goalY], map);
+
+        if (roadPath) {
+            roadPaths.push(roadPath);
+            for (const [x, y] of roadPath) {
+                if (map[y][x] !== 'water' && map[y][x] !== 'dirt') {
+                    map[y][x] = 'road';
+                }
+            }
+        }
     }
 
-    for (const roadPath of roadPaths) {
-        if (roadPath) {
-            for (const [x, y] of roadPath) {
-                if (map[y][x] !== 'water') {
+    // Create intersections
+    createIntersections(map, roadPaths);
+}
+
+function createIntersections(map, roadPaths) {
+    for (let i = 0; i < roadPaths.length; i++) {
+        for (let j = i + 1; j < roadPaths.length; j++) {
+            for (const [x, y] of roadPaths[i]) {
+                if (roadPaths[j].some(([rx, ry]) => rx === x && ry === y)) {
                     map[y][x] = 'road';
                 }
             }
