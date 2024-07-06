@@ -4,9 +4,12 @@ import { TILE_SIZE, MAP_WIDTH, MAP_HEIGHT } from './utils/constants.js';
 
 export function generateRandomMap(ctx) {
     console.log('Generating random map...');
+    const map = [];
     for (let y = 0; y < MAP_HEIGHT; y++) {
+        map[y] = [];
         for (let x = 0; x < MAP_WIDTH; x++) {
             const tileType = getRandomTileType();
+            map[y][x] = tileType;
             console.log(`Drawing ${tileType} at (${x}, ${y})`);
             drawTile(ctx, tileType, x, y);
         }
@@ -14,7 +17,7 @@ export function generateRandomMap(ctx) {
 }
 
 function getRandomTileType() {
-    const types = ['grass', 'water', 'tree', 'bush', 'dirt', 'road'];
+    const types = ['grass', 'grass', 'grass', 'water', 'tree', 'bush', 'dirt', 'road'];
     const randomIndex = Math.floor(Math.random() * types.length);
     return types[randomIndex];
 }
