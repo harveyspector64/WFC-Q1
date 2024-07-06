@@ -1,6 +1,6 @@
 // main.js
 import { loadTiles } from './tileLoader.js';
-import { generateRandomMap } from './mapGenerator.js';
+import { generateWFCTile } from './mapGenerator.js';
 import { TILE_SIZE, MAP_WIDTH, MAP_HEIGHT } from './utils/constants.js';
 
 const canvas = document.getElementById('mapCanvas');
@@ -13,7 +13,7 @@ canvas.height = MAP_HEIGHT * TILE_SIZE;
 // Load tiles and generate the map
 loadTiles().then(() => {
     console.log('All tiles loaded');
-    generateRandomMap(ctx);
+    generateWFCTile(ctx);
 }).catch(err => {
     console.error('Failed to load tiles:', err);
 });
