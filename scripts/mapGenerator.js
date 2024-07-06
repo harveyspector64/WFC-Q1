@@ -18,6 +18,7 @@ export function generateMap(ctx) {
     generateBaseTerrain(map);
     generateLakesAndRivers(map);
     generateRoads(map);
+    placeStructures(map);
     drawMap(ctx, map);
     console.log('Map generation complete.');
 }
@@ -142,22 +143,38 @@ function createIntersections(map, roadPaths) {
     }
 }
 
-function drawMap(ctx, map) {
-    for (let y = 0; y < MAP_HEIGHT; y++) {
-        for (let x = 0; x < MAP_WIDTH; x++) {
-            if (!map[y][x]) {
-                map[y][x] = 'grass';
-            }
-            drawTile(ctx, map[y][x], x, y);
-        }
+function placeStructures(map) {
+    console.log('Placing structures...');
+    placeBarn(map);
+    placeSilo(map);
+}
+
+function placeBarn(map) {
+    const barnX = Math.floor(Math.random() * MAP_WIDTH);
+    const barnY = Math.floor(Math.random() * MAP_HEIGHT);
+
+    if (map[barnY][barnX] === 'grass') {
+        map[barnY][barnX] = 'barn';
     }
 }
 
-function drawTile(ctx, tileType, x, y) {
-    const tile = getTile(tileType);
-    if (tile) {
-        ctx.drawImage(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    } else {
-        console.error(`Tile ${tileType} not found.`);
+function placeSilo(map) {
+    const siloX = Math.floor(Math.random() * MAP_WIDTH);
+    const siloY = Math.floor(Math.random() * MAP_HEIGHT);
+
+    if (map[siloY][siloX] === 'grass') {
+        map[siloY][siloX] = 'silo';
+    }
+}
+
+function drawMap(ctx, map) {
+    for (let y = 0; y < map.length; y++) {
+        for (let x = 0; x < map[y].length; x++) {
+            const tileType = map[y][x] || 'grass';
+            const tile = getTile(tileType);
+            if (tile) {
+                ctx.drawImage(tile, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            }
+        }
     }
 }
