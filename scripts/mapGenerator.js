@@ -1,6 +1,6 @@
 import { getTile } from './tileLoader.js';
 import { TILE_SIZE, MAP_WIDTH, MAP_HEIGHT } from './utils/constants.js';
-import { aStar, generateRoadNetwork } from './utils/aStar.js';
+import { aStar, createCurvedPath, generateRoadNetwork } from './utils/aStar.js';
 
 // Define more detailed patterns for different terrains
 const terrainPatterns = {
