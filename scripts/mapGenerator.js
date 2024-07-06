@@ -66,9 +66,8 @@ function createRandomTerrainRegions(map, terrainType, count) {
 
 function generateLakesAndRivers(map) {
     console.log('Generating rivers and lakes...');
-    // Generate rivers with curved paths
     const riverPaths = [];
-    const riverCount = Math.floor(Math.random() * 3) + 1; // Random number of rivers between 1 and 3
+    const riverCount = Math.floor(Math.random() * 3) + 1;
 
     for (let i = 0; i < riverCount; i++) {
         const startY = Math.floor(Math.random() * MAP_HEIGHT);
@@ -80,15 +79,14 @@ function generateLakesAndRivers(map) {
         if (riverPath) {
             riverPaths.push(riverPath);
             for (const [x, y] of riverPath) {
-                if (map[y][x] !== 'road') {
+                if (map[y][x] !== 'road' && map[y][x] !== 'dirt') {
                     map[y][x] = 'water';
                 }
             }
         }
     }
 
-    // Generate lakes/ponds
-    const lakeCount = Math.floor(Math.random() * 3) + 1; // Random number of lakes between 1 and 3
+    const lakeCount = Math.floor(Math.random() * 3) + 1;
     for (let i = 0; i < lakeCount; i++) {
         const lakeX = Math.floor(Math.random() * MAP_WIDTH);
         const lakeY = Math.floor(Math.random() * MAP_HEIGHT);
@@ -110,15 +108,14 @@ function createLake(map, startX, startY, width, height) {
 
 function generateRoads(map) {
     console.log('Generating roads...');
-    // Generate more complex road paths with intersections
     const roadPaths = [];
-    const roadCount = Math.floor(Math.random() * 3) + 1; // Random number of roads between 1 and 3
+    const roadCount = Math.floor(Math.random() * 3) + 1;
 
     for (let i = 0; i < roadCount; i++) {
         const startX = Math.floor(Math.random() * MAP_WIDTH);
         const startY = 0;
         const goalY = MAP_HEIGHT - 1;
-        const roadPath = createCurvedPath([startX, startY], [startX, goalY], map);
+        const roadPath = aStar([startX, startY], [startX, goalY], map);
 
         if (roadPath) {
             roadPaths.push(roadPath);
@@ -130,7 +127,6 @@ function generateRoads(map) {
         }
     }
 
-    // Create intersections
     createIntersections(map, roadPaths);
 }
 
@@ -150,7 +146,7 @@ function drawMap(ctx, map) {
     for (let y = 0; y < MAP_HEIGHT; y++) {
         for (let x = 0; x < MAP_WIDTH; x++) {
             if (!map[y][x]) {
-                map[y][x] = 'grass'; // Default to grass if no tile assigned
+                map[y][x] = 'grass';
             }
             drawTile(ctx, map[y][x], x, y);
         }
