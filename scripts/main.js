@@ -1,6 +1,5 @@
-// main.js
-import { generateMap } from './mapGenerator.js';
 import { loadTiles } from './tileLoader.js';
+import { generateMap } from './mapGenerator.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('gameCanvas');
@@ -21,6 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
             generateMap(ctx);
         })
         .catch(error => {
-            console.error('Failed to load tiles:', error);
+            console.error('Failed to load tiles', error);
         });
 });
