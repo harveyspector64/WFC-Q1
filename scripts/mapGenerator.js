@@ -1,6 +1,7 @@
+// mapGenerator.js
 import { getTile } from './tileLoader.js';
 import { TILE_SIZE, MAP_WIDTH, MAP_HEIGHT } from './utils/constants.js';
-import { aStar, createCurvedPath } from './utils/aStar.js';
+import { aStar, createCurvedPath, generateRoadNetwork } from './utils/aStar.js';
 
 // Define more detailed patterns for different terrains
 const terrainPatterns = {
@@ -105,17 +106,13 @@ function generateWaterAndLakes(map) {
 
 function generateRoads(map) {
     console.log('Generating roads...');
-    for (let i = 0; i < 5; i++) {
-        const startX = Math.floor(Math.random() * MAP_WIDTH);
-        const startY = Math.floor(Math.random() * MAP_HEIGHT);
-        const endX = Math.floor(Math.random() * MAP_WIDTH);
-        const endY = Math.floor(Math.random() * MAP_HEIGHT);
-        const roadPath = createCurvedPath([startX, startY], [endX, endY], map);
-        roadPath.forEach(([x, y]) => {
-            if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+    const roads = generateRoadNetwork(map, 10);
+    for (const road of roads) {
+        for (const [x, y] of road) {
+            if (map[y][x] !== 'water') {
                 map[y][x] = 'road';
             }
-        });
+        }
     }
     console.log('Road generation complete.');
 }
