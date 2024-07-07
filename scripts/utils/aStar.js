@@ -1,4 +1,6 @@
-// aStar.js
+// utils/aStar.js
+import { MAP_WIDTH, MAP_HEIGHT } from './constants.js';
+
 export function aStar(start, goal, map) {
     const openSet = [start];
     const cameFrom = {};
@@ -76,4 +78,15 @@ export function createCurvedPath(start, goal, map) {
     
     path.push(goal);
     return path;
+}
+
+export function generateRoadNetwork(map, roadCount) {
+    const roads = [];
+    for (let i = 0; i < roadCount; i++) {
+        const start = [Math.floor(Math.random() * MAP_WIDTH), Math.floor(Math.random() * MAP_HEIGHT)];
+        const end = [Math.floor(Math.random() * MAP_WIDTH), Math.floor(Math.random() * MAP_HEIGHT)];
+        const road = createCurvedPath(start, end, map);
+        roads.push(road);
+    }
+    return roads;
 }
